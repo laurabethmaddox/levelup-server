@@ -1,0 +1,13 @@
+[
+    {
+        "model": "levelupapi.event",
+        "pk": 1,
+        "fields": {
+            "game": 1,
+            "description": "Candy Land night",
+            "date": "2022-05-23",
+            "time": "5:00",
+            "organizer": 1
+        }
+    }
+]
