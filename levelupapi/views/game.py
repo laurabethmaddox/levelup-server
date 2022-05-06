@@ -4,8 +4,7 @@ from django.core.exceptions import ValidationError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
-from levelupapi.models import Game
-from levelupapi.models.gamer import Gamer
+from levelupapi.models import Game, Gamer, GameType
 
 
 class GameView(ViewSet):
@@ -55,6 +54,19 @@ class GameView(ViewSet):
         serializer.is_valid(raise_exception=True) # is_valid is to make sure the client sent valid data.
         serializer.save(gamer=gamer) # If code passes validation, the save method will add the game to the datbase and add an id to the serializer
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk):
+        """Handle PUT requests for a game
+
+        Returns:
+            Response -- Empty body with 204 status code
+        """
+
+        game = Game.objects.get(pk=pk)
+        serializer = CreateGameSerializer(game, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
 class GameSerializer(serializers.ModelSerializer):

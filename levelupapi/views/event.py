@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import serializers, status
 from levelupapi.models import Event
 from levelupapi.models import Gamer
+from levelupapi.models import Game
 
 
 class EventView(ViewSet):
@@ -53,6 +54,19 @@ class EventView(ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(organizer=organizer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk):
+        """Handle PUT requests for an event
+
+        Returns:
+            Response -- Empty body with 204 status code
+        """
+
+        event = Event.objects.get(pk=pk)
+        serializer = CreateEventSerializer(event, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
 class EventSerializer(serializers.ModelSerializer):
