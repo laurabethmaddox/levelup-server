@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework import serializers, status
 from levelupapi.models import Event
 from levelupapi.models import Gamer
-from levelupapi.models import Game
 
 
 class EventView(ViewSet):
