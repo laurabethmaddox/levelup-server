@@ -1,10 +1,12 @@
 """View module for handling requests about events"""
+from tkinter import E
 from django.http import HttpResponseServerError
 from django.core.exceptions import ValidationError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
-from levelupapi.models import Event
+from rest_framework.decorators import action
+from levelupapi.models import Event, event
 from levelupapi.models import Gamer
 
 
@@ -66,6 +68,32 @@ class EventView(ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    def destroy(self, request, pk):
+        event = Event.objects.get(pk=pk)
+        event.delete()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    # With Django REST you can create a custom action that your API will support by using @action above a method within a ViewSet
+    # Using the action decorator turns a method into a new route
+    # The route is named after the function. To call this method the url would be "http://localhost:8000/events/2/signup"
+    @action(methods=['post'], detail=True) # In this case, the action will accept POST methods and because deatil=True the url will include the pk
+    def signup(self, request, pk): # We need to know which event the user wants to sign up for we'll need to have th pk
+        """Post request for a user to sign up for an event"""
+
+        gamer = Gamer.objects.get(user=request.auth.user) # We get the gamer that's logged in
+        event = Event.objects.get(pk=pk) # We get the event by it's pk
+        event.attendees.add(gamer) # The add method creates the relationship between this event and gamer by adding the event_id and gamer_id to the join table
+        return Response({'message': 'Gamer added'}, status=status.HTTP_201_CREATED) # The response sends back a 201 status code
+
+    @action(methods=['delete'], detail=True)
+    def leave(self, request, pk):
+        """Delete request for a user to leave an event"""
+
+        gamer = Gamer.objects.get(user=request.auth.user)
+        event = Event.objects.get(pk=pk)
+        event.attendees.remove(gamer)
+        return Response({'message': 'Gamer removed'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class EventSerializer(serializers.ModelSerializer):

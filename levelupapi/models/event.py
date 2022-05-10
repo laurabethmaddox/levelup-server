@@ -8,3 +8,4 @@ class Event(models.Model):
     date = models.DateField()
     time = models.TimeField()
     organizer = models.ForeignKey("Gamer", on_delete=models.CASCADE)
+    attendees = models.ManyToManyField("Gamer", related_name="attendees")

@@ -68,6 +68,12 @@ class GameView(ViewSet):
         serializer.save()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
+    # Takes the pk as an argument. Uses that pk to get the single object, then call the delete from the ORM to remove it from the database
+    def destroy(self, request, pk):
+        game = Game.objects.get(pk=pk)
+        game.delete()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
 
 class GameSerializer(serializers.ModelSerializer):
     """JSON serializer for games
